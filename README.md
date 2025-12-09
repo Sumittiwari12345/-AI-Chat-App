@@ -1,354 +1,165 @@
 # Loan Picks Dashboard
 
-A production-ready, AI-powered loan product recommendation and comparison dashboard built with Next.js 14, TypeScript, shadcn/ui, and Supabase.
+AI-powered loan product discovery and comparison built with Next.js, TypeScript, shadcn/ui, Supabase, and OpenAI. Currency display is formatted in INR for all product amounts.
 
-## 🎯 Project Overview
+## Overview
+- Personalized dashboard with top loan matches and “Best Match” highlight.
+- Full products catalog with advanced filtering (category, amount, rate, pre-approval, search).
+- Product-specific AI chat with grounding and fail-safes.
+- Smart badge system (3–5 badges per product) driven by product attributes.
+- Production-ready setup: Vercel config, Zod validation, TypeScript strict, linting.
 
-This dashboard provides personalized loan product recommendations with AI-powered chat assistance. Users can view their top 5 personalized loan matches, explore all available products with advanced filtering, and interact with an AI assistant that answers questions based solely on the selected product's information.
+## Tech Stack
+- Next.js App Router, React 19, TypeScript.
+- UI: shadcn/ui (Radix) + Tailwind CSS v4.
+- Backend: Next.js API routes with Zod validation.
+- Data: Supabase (PostgreSQL) + mock data for local.
+- AI: OpenAI GPT-4o-mini with grounding.
 
-## ✨ Features
+## Architecture (high level)
+- Next.js App Router with server API routes under `src/app/api`.
+- Feature pages: dashboard (`src/app/page.tsx`) and products (`src/app/products/page.tsx`).
+- UI layer: shadcn/ui primitives + custom components (`src/components`).
+- Business logic: validation, badge logic, AI grounding, utilities (`src/lib`).
+- Data: Supabase client + mock data; schema in `supabase/schema.sql`.
 
-### Core Features
-- **Personalized Dashboard**: Top 5 loan matches based on user profile
-- **Best Match Highlighting**: Visual distinction for the highest-scoring match
-- **Smart Badge System**: Automatically generated badges (3-5 per product) based on product attributes
-- **AI Chat Interface**: Product-specific AI assistant with grounding strategy
-- **Advanced Filtering**: Comprehensive product filtering system
-- **Responsive Design**: Mobile-first, modern UI with shadcn/ui components
-
-### Technical Features
-- **TypeScript**: Full type safety, no `any` types
-- **Zod Validation**: Runtime validation for all API inputs
-- **AI Grounding**: Context-aware responses limited to product information
-- **Fail-Safe Messaging**: Handles out-of-scope questions gracefully
-- **Production-Ready**: Vercel deployment configuration included
-
-## 🏗️ Architecture
-
-### Technology Stack
-- **Frontend**: Next.js 14 (App Router), React 19, TypeScript
-- **UI**: shadcn/ui, Radix UI, Tailwind CSS v4
-- **Backend**: Next.js API Routes
-- **Database**: Supabase (PostgreSQL)
-- **AI**: OpenAI GPT-4o-mini
-- **Validation**: Zod
-- **Deployment**: Vercel
-
-### Folder Structure
-```
-loan-picks-dashboard/
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── products/route.ts      # Product listing & filtering
-│   │   │   ├── recommendations/route.ts # Personalized recommendations
-│   │   │   └── chat/route.ts           # AI chat endpoint
-│   │   ├── products/
-│   │   │   └── page.tsx                # All products page
-│   │   ├── layout.tsx                  # Root layout
-│   │   ├── page.tsx                    # Dashboard page
-│   │   └── globals.css                 # Global styles
-│   ├── components/
-│   │   ├── ui/                         # shadcn/ui components
-│   │   │   ├── badge.tsx
-│   │   │   ├── button.tsx
-│   │   │   ├── card.tsx
-│   │   │   ├── dialog.tsx
-│   │   │   ├── input.tsx
-│   │   │   └── select.tsx
-│   │   ├── ai-chat.tsx                 # AI chat component
-│   │   ├── loan-card.tsx               # Product card component
-│   │   └── product-filters.tsx         # Filter component
-│   └── lib/
-│       ├── types.ts                    # TypeScript types
-│       ├── schemas.ts                  # Zod schemas
-│       ├── utils.ts                    # Utility functions
-│       ├── badge-logic.ts              # Badge generation logic
-│       ├── ai-grounding.ts             # AI grounding strategy
-│       ├── supabase.ts                 # Supabase client
-│       └── mock-data.ts                # Mock data (dev)
-├── supabase/
-│   └── schema.sql                      # Database schema
-├── ARCHITECTURE.md                     # Architecture documentation
-├── BADGE_LOGIC.md                      # Badge logic documentation
-├── AI_GROUNDING.md                      # AI grounding strategy
-└── README.md                           # This file
+```text
+┌─────────────────────┐
+│      Client UI      │
+│  • Dashboard (/)    │
+│  • Products page    │
+│    - Filters/cards  │
+│    - AI chat dialog │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│  Next.js API Routes │
+│  • /api/products    │
+│  • /api/recommend   │
+│  • /api/chat        │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│  Business Logic     │
+│  • schemas (Zod)    │
+│  • badge-logic      │
+│  • ai-grounding     │
+│  • utils (INR fmt)  │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│    Data Sources     │
+│  • Supabase/Postgres│
+│  • Mock data        │
+│  • OpenAI (chat)    │
+└─────────────────────┘
 ```
 
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js 18+ and npm
-- Supabase account (or PostgreSQL database)
-- OpenAI API key
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd loan-picks-dashboard
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install --legacy-peer-deps
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Edit `.env.local` with your credentials:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-   OPENAI_API_KEY=your_openai_api_key
-   ```
-
-4. **Set up database**
-   - Create a new Supabase project
-   - Run the SQL script from `supabase/schema.sql` in the Supabase SQL Editor
-   - Or use the Supabase dashboard to create tables manually
-
-5. **Run development server**
-   ```bash
-   npm run dev
-   ```
-
-6. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 📊 Data Model
-
-### Loan Products Table
-```sql
-- id: UUID (Primary Key)
-- name: VARCHAR(200)
-- description: TEXT
-- interest_rate: DECIMAL(5,2)
-- min_amount: DECIMAL(15,2)
-- max_amount: DECIMAL(15,2)
-- min_term_months: INTEGER
-- max_term_months: INTEGER
-- eligibility_score: INTEGER (0-100)
-- category: VARCHAR(50) (personal|home|auto|business|student|credit-card)
-- features: JSONB (array of strings)
-- requirements: JSONB (array of strings)
-- is_pre_approved: BOOLEAN
-- processing_time: VARCHAR(100)
-- max_ltv: DECIMAL(5,2) (nullable)
-- credit_score_min: INTEGER (nullable, 300-850)
-- income_min: DECIMAL(15,2) (nullable)
-- created_at: TIMESTAMP
-- updated_at: TIMESTAMP
+## Request Flow (diagram)
+```text
+┌─────────────────────┐
+│ User action         │
+│ (view/filter/chat)  │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│ Client UI fetches   │
+│ /api/*              │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│ Next.js API routes  │
+│ • products          │
+│ • recommendations   │
+│ • chat              │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│ Business logic      │
+│ • schemas (Zod)     │
+│ • badge-logic       │
+│ • ai-grounding      │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│ Data sources        │
+│ • Supabase/Postgres │
+│ • Mock data (local) │
+│ • OpenAI (chat)     │
+└─────────┬───────────┘
+          │
+┌─────────▼───────────┐
+│ Response to UI      │
+└─────────────────────┘
 ```
 
-### Chat Sessions Table
-```sql
-- id: UUID (Primary Key)
-- product_id: UUID (Foreign Key → loan_products)
-- user_id: UUID
-- messages: JSONB (array of message objects)
-- created_at: TIMESTAMP
-- updated_at: TIMESTAMP
-```
+## AI Grounding (chat)
+- System prompt forces product-only answers; no inventing data.
+- Scope guard: out-of-scope keywords like “compare with/other lender” trigger a polite fail-safe.
+- Context: full product context + last 6 messages sent on every request.
+- Response guard: falls back to product summary if AI/KEY is unavailable or response lacks product context.
+- Offline fallback: if the chat API errors, UI shows product details from local data.
 
-## 🔌 API Routes
+## Folder Structure
+- `src/app/` – Routes and layouts (`page.tsx`, `products/page.tsx`, API routes under `api/`).
+- `src/components/` – UI primitives and feature components (`ai-chat`, `loan-card`, `product-filters`).
+- `src/lib/` – Types, schemas, utils (INR currency formatting), badge logic, AI grounding, Supabase client, mock data.
+- `supabase/` – `schema.sql` with tables, indexes, and RLS policies.
+- `vercel.json`, `next.config.ts`, `.env.example` – Deployment and config.
 
+## API Contracts
 ### GET `/api/products`
-Fetch all products with optional filtering.
-
-**Query Parameters:**
-- `category`: Comma-separated categories
-- `minAmount`: Minimum loan amount
-- `maxAmount`: Maximum loan amount
-- `minInterestRate`: Minimum interest rate
-- `maxInterestRate`: Maximum interest rate
-- `isPreApproved`: Boolean
-- `searchQuery`: Search string
-
-**Response:**
-```json
-{
-  "products": [
-    {
-      "id": "uuid",
-      "name": "Product Name",
-      ...
-    }
-  ]
-}
-```
+- Filters: `category`, `minAmount`, `maxAmount`, `minTermMonths`, `maxTermMonths`, `minInterestRate`, `maxInterestRate`, `isPreApproved`, `searchQuery`.
+- Returns filtered products or `400` on invalid params.
 
 ### POST `/api/recommendations`
-Get personalized loan recommendations.
-
-**Request Body:**
-```json
-{
-  "userId": "uuid",
-  "creditScore": 720,
-  "income": 75000,
-  "loanAmount": 50000,
-  "preferredTermMonths": 60
-}
-```
-
-**Response:**
-```json
-{
-  "products": [
-    {
-      "id": "uuid",
-      "eligibilityScore": 92,
-      ...
-    }
-  ]
-}
-```
+- Body: `userId` (required) plus optional `creditScore`, `income`, `loanAmount`, `preferredTermMonths`, `loanPurpose`.
+- Returns top 5 products sorted by calculated eligibility score; falls back to defaults on validation issues.
 
 ### POST `/api/chat`
-Send a message to the AI chat.
+- Body: `message` (required), `productId` (required), `history` (optional).
+- Grounded to the selected product; out-of-scope questions return a fail-safe.
 
-**Request Body:**
-```json
-{
-  "message": "What is the interest rate?",
-  "productId": "uuid",
-  "history": []
-}
-```
+## Badge Logic (auto-generated)
+| Badge | Variant | Priority | Condition |
+|-------|---------|----------|-----------|
+| Pre-Approved | success | 1 | `isPreApproved === true` |
+| Low Rate | success | 2 | `interestRate < 5%` |
+| Competitive Rate | default | 3 | `5% <= interestRate < 8%` |
+| Fast Approval | success | 2 | Processing includes “24 hours”/“Same day” |
+| Quick Processing | default | 4 | Processing includes “48 hours”/“2 days” |
+| High Match | success | 2 | `eligibilityScore >= 85` |
+| Good Match | default | 5 | `70 <= eligibilityScore < 85` |
+| Flexible Terms | default | 4 | Term span ≥ 60 months |
+| High Limit | default | 5 | `maxAmount >= 500000` |
+| No Credit Check | secondary | 3 | `creditScoreMin === null` |
+| Low Minimum | default | 6 | `minAmount <= 1000` |
+| High LTV | default | 4 | `category === "home" && maxLtv >= 90` |
+| Available (fallback) | outline | 10 | Always present if <3 badges |
 
-**Response:**
-```json
-{
-  "response": "The interest rate for this product is 4.5%..."
-}
-```
+## AI Grounding (chat)
+- System prompt enforces product-only answers; no inventing data.
+- Out-of-scope detection: keywords like “compare with”, “other lender”, etc.; returns a polite fail-safe.
+- Context: last 6 messages + full product context per call.
+- Response guard: falls back to product summary if AI/KEY unavailable or response lacks product context.
 
-## 🎨 Badge Logic
+## Data Model (key fields)
+- LoanProduct: `id`, `name`, `description`, `interestRate`, `minAmount`, `maxAmount`, `minTermMonths`, `maxTermMonths`, `eligibilityScore`, `category`, `features[]`, `requirements[]`, `isPreApproved`, `processingTime`, optional `maxLtv`, `creditScoreMin`, `incomeMin`, timestamps.
+- ChatMessage: `id`, `role`, `content`, `productId`, `timestamp`.
 
-The system automatically generates 3-5 badges per product based on attributes:
+## Setup
+1) Install: `npm install --legacy-peer-deps`  
+2) Env: copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `OPENAI_API_KEY` (optional; chat falls back to product summary).  
+3) Database (optional): run `supabase/schema.sql` in Supabase/Postgres.  
+4) Develop: `npm run dev` → http://localhost:3000  
+5) Lint/Build: `npm run lint` | `npm run build`
 
-- **Pre-Approved**: `isPreApproved === true`
-- **Low Rate**: `interestRate < 5%`
-- **Fast Approval**: Processing time ≤ 24 hours
-- **High Match**: `eligibilityScore >= 85`
-- **Flexible Terms**: Term range ≥ 60 months
-- And more...
+## Deployment (Vercel)
+- Import repo, add env vars, deploy.  
+- `vercel.json` sets build/install commands and env mapping.  
+- Turbopack root pinned in `next.config.ts` to avoid parent lockfile issues.
 
-See `BADGE_LOGIC.md` for complete documentation.
-
-## 🤖 AI Grounding Strategy
-
-The AI chat system uses a grounding strategy to ensure responses are based solely on the selected product:
-
-1. **Product Context Injection**: Full product details included in every request
-2. **Scope Detection**: Identifies out-of-scope questions
-3. **Fail-Safe Messages**: Handles questions outside available data
-4. **History Management**: Maintains conversation context (last 6 messages)
-
-See `AI_GROUNDING.md` for detailed documentation.
-
-## 🚢 Deployment
-
-### Vercel Deployment
-
-1. **Push to GitHub**
-   ```bash
-   git push origin main
-   ```
-
-2. **Import to Vercel**
-   - Go to [vercel.com](https://vercel.com)
-   - Click "New Project"
-   - Import your repository
-
-3. **Configure Environment Variables**
-   - Add all variables from `.env.local`
-   - Supabase URL and keys
-   - OpenAI API key
-
-4. **Deploy**
-   - Vercel will automatically deploy
-   - Your app will be live at `your-project.vercel.app`
-
-### Environment Variables (Production)
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-OPENAI_API_KEY=your_openai_api_key
-```
-
-## 🧪 Development
-
-### Running Tests
-```bash
-npm run lint
-```
-
-### Building for Production
-```bash
-npm run build
-npm start
-```
-
-## 📝 Code Quality Standards
-
-- **TypeScript**: Strict mode enabled, no `any` types
-- **ESLint**: Next.js recommended configuration
-- **Component Structure**: Reusable, composable components
-- **API Validation**: All inputs validated with Zod
-- **Error Handling**: Comprehensive error handling throughout
-
-## 🔒 Security Considerations
-
-- **Input Validation**: All API inputs validated with Zod schemas
-- **Row-Level Security**: Supabase RLS policies enabled
-- **Environment Variables**: Sensitive keys stored securely
-- **API Key Protection**: Server-side only API key usage
-- **SQL Injection Prevention**: Parameterized queries via Supabase
-
-## 📚 Documentation
-
-- **ARCHITECTURE.md**: System architecture and design decisions
-- **BADGE_LOGIC.md**: Badge generation rules and logic
-- **AI_GROUNDING.md**: AI chat grounding strategy details
-
-## 🤝 Contributing
-
-1. Follow TypeScript best practices
-2. Use Zod for validation
-3. Maintain component reusability
-4. Write clear, documented code
-5. Test thoroughly before submitting
-
-## 📄 License
-
-This project is built for educational/demonstration purposes.
-
-## 🎓 Assignment/Internship Notes
-
-### Key Highlights
-- **Production-Ready**: Full deployment configuration
-- **Type-Safe**: Complete TypeScript implementation
-- **Scalable**: Architecture supports growth
-- **Documented**: Comprehensive documentation
-- **Modern Stack**: Industry-standard technologies
-
-### Learning Outcomes
-- Next.js 14 App Router patterns
-- TypeScript best practices
-- AI integration with grounding
-- Database design and queries
-- API design and validation
-- Component architecture
-- Production deployment
-
----
-
-Built with ❤️ using Next.js, TypeScript, and modern web technologies.
-"# The-Loan-Picks-Dashboard-" 
+## Notes
+- Currency formatting uses INR across UI and chat fallbacks.
+- Mock data included for local development; Supabase client warns if creds are missing. 
 "# The-Loan-Picks-Dashboard-" 
